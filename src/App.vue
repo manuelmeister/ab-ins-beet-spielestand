@@ -68,7 +68,6 @@
                 Spieler hinzufügen
               </v-btn>
               <v-btn
-                class="ml-auto"
                 :color="canStart ? 'win' : undefined"
                 type="submit"
                 prepend-icon="mdi-play"
@@ -204,7 +203,7 @@
                       divided
                       multiple
                       height="auto"
-                      class="color-toggle"
+                      class="color-toggle mb-3"
                       variant="outlined"
                     >
                       <v-btn

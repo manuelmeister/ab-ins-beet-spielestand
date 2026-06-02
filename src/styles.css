@@ -68,6 +68,7 @@ body {
   align-items: center;
   flex-wrap: wrap;
   gap: 12px;
+  justify-content: space-between;
 }
 
 .setup-panel,
@@ -378,9 +379,12 @@ body {
   }
 
   .player-grid,
-  .number-row,
   .podium-stage {
     grid-template-columns: 1fr;
+  }
+
+  .number-row {
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
   }
 
   .podium-page {
