@@ -7,6 +7,11 @@ describe('scoreBeet', () => {
     expect(emptyBeet().hasHalfSalads).toBe(false)
   })
 
+  it('defaults to no selected colors', () => {
+    expect(emptyBeet().colorSlots).toEqual([])
+    expect(scoreBeet({ colorSlots: [], wholeSalads: 0, hasHalfSalads: true, tomatoes: 0, peppers: 0 })).toBe(0)
+  })
+
   it('scores color points for one, two and three colors', () => {
     expect(scoreBeet({ colors: 1, wholeSalads: 0, hasHalfSalads: true, tomatoes: 0, peppers: 0 })).toBe(3)
     expect(scoreBeet({ colors: 2, wholeSalads: 0, hasHalfSalads: true, tomatoes: 0, peppers: 0 })).toBe(1)

@@ -142,19 +142,21 @@
             <div class="round-actions">
               <v-btn
                 v-if="game.currentRound < 3"
-                color="win"
-                variant="flat"
+                :color="canLeaveCurrentRound ? 'win' : undefined"
+                :variant="canLeaveCurrentRound ? 'flat' : 'text'"
                 append-icon="mdi-arrow-right"
+                :readonly="!canLeaveCurrentRound"
                 @click="advanceRound"
               >
                 Nächste Runde
               </v-btn>
               <v-btn
                 v-else
-                color="win"
-                variant="flat"
+                :color="canLeaveCurrentRound ? 'win' : 'surface'"
+                :variant="canLeaveCurrentRound ? 'flat' : 'text'"
                 append-icon="mdi-trophy"
-                @click="((selectedTab = podiumTab), (game.finished = true))"
+                :readonly="!canLeaveCurrentRound"
+                @click="showPodium"
               >
                 Zum Podest
               </v-btn>
@@ -500,14 +502,6 @@ import {
 } from "./scoring";
 
 const STORAGE_KEY = "ab-ins-beet-spielestand";
-
-const setupNames = ref(["", ""]);
-const game = ref<Game | null>(loadGame());
-const podiumTab = ROUND_COUNT;
-const selectedTab = ref<number>((game.value?.currentRound ?? 1) - 1);
-const finished = ref<boolean>(false);
-const rounds = Array.from({ length: ROUND_COUNT }, (_, index) => index + 1);
-const confettiPieces = Array.from({ length: 34 }, (_, index) => index);
 const allBeetColors: BeetColor[] = ["magenta", "blue", "yellow"];
 const beetColorOptions = [
   {
@@ -535,6 +529,14 @@ const beetColorOptions = [
   bg: string;
 }>;
 
+const setupNames = ref(["", ""]);
+const game = ref<Game | null>(loadGame());
+const podiumTab = ROUND_COUNT;
+const selectedTab = ref<number>((game.value?.currentRound ?? 1) - 1);
+const finished = ref<boolean>(false);
+const rounds = Array.from({ length: ROUND_COUNT }, (_, index) => index + 1);
+const confettiPieces = Array.from({ length: 34 }, (_, index) => index);
+
 const canStart = computed(
   () => setupNames.value.filter((name) => name.trim()).length >= 2,
 );
@@ -553,6 +555,18 @@ const selectedRoundTotals = computed<PlayerRoundTotal[]>(() => {
     game.value.players.map(
       (player) =>
         game.value?.rounds[player.id][selectedRoundIndex.value] as RoundScore,
+    ),
+  );
+});
+
+const canLeaveCurrentRound = computed(() => {
+  if (!game.value) {
+    return false;
+  }
+
+  return game.value.players.every((player) =>
+    game.value?.rounds[player.id][selectedRoundIndex.value].beets.every(
+      (beet) => (beet.colorSlots?.length ?? 0) > 0,
     ),
   );
 });
@@ -743,11 +757,24 @@ function resetGame() {
 }
 
 function advanceRound() {
-  if (!game.value || game.value.currentRound >= 3) {
+  if (
+    !game.value ||
+    game.value.currentRound >= 3 ||
+    !canLeaveCurrentRound.value
+  ) {
     return;
   }
 
   game.value.currentRound = (game.value.currentRound + 1) as 1 | 2 | 3;
+}
+
+function showPodium() {
+  if (!game.value || !canLeaveCurrentRound.value) {
+    return;
+  }
+
+  selectedTab.value = podiumTab;
+  game.value.finished = true;
 }
 
 function confettiStyle(index: number) {
@@ -800,16 +827,16 @@ function normalizeBeetColors(beet: {
   colors?: 1 | 2 | 3;
   colorSlots?: unknown;
 }) {
-  const selectedColors = Array.isArray(beet.colorSlots)
-    ? beet.colorSlots.filter((color): color is BeetColor =>
-        allBeetColors.includes(color as BeetColor),
-      )
-    : [];
+  if (Array.isArray(beet.colorSlots)) {
+    const selectedColors = beet.colorSlots.filter((color): color is BeetColor =>
+      allBeetColors.includes(color as BeetColor),
+    );
 
-  beet.colorSlots =
-    selectedColors.length > 0
-      ? [...new Set(selectedColors)]
-      : allBeetColors.slice(0, beet.colors ?? 3);
+    beet.colorSlots = [...new Set(selectedColors)];
+    return;
+  }
+
+  beet.colorSlots = allBeetColors.slice(0, beet.colors ?? 3);
 }
 
 function loadGame(): Game | null {

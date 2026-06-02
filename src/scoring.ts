@@ -39,7 +39,6 @@ export const ROUND_COUNT = 3;
 export const BEETS_PER_ROUND = 3;
 
 export const emptyBeet = (): BeetScoreInput => ({
-  colors: 3,
   colorSlots: [],
   wholeSalads: 0,
   hasHalfSalads: false,
@@ -65,16 +64,17 @@ export const scoreBeet = (beet: BeetScoreInput): number => {
   return colorPoints + saladPoints + cleanSaladPoint + pairPoints;
 };
 
-export const countBeetColors = (beet: BeetScoreInput): 1 | 2 | 3 => {
+export const countBeetColors = (beet: BeetScoreInput): 0 | 1 | 2 | 3 => {
   const validColors = new Set<BeetColor>(["magenta", "blue", "yellow"]);
-  const count = new Set(
-    (beet.colorSlots ?? []).filter((color): color is BeetColor =>
-      validColors.has(color as BeetColor),
-    ),
-  ).size;
 
-  if (count === 1 || count === 2 || count === 3) {
-    return count;
+  if (Array.isArray(beet.colorSlots)) {
+    const count = new Set(
+      beet.colorSlots.filter((color): color is BeetColor =>
+        validColors.has(color as BeetColor),
+      ),
+    ).size;
+
+    return count === 1 || count === 2 || count === 3 ? count : 0;
   }
 
   return beet.colors === 1 || beet.colors === 2 || beet.colors === 3
