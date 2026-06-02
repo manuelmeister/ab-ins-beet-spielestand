@@ -1,7 +1,14 @@
 :root {
   color: #24372f;
   background: #f7f3e8;
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-weight:500;
+  font-family:
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
 }
 
 body {
@@ -30,6 +37,10 @@ body {
 .final-panel h2 {
   margin: 0;
   line-height: 1.05;
+  font-family: "Adumu", Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,  "Segoe UI", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #ffdb00;
 }
 
 .topbar h1 {
@@ -38,11 +49,16 @@ body {
 
 .eyebrow {
   margin: 0 0 6px;
-  color: #6b5942;
-  font-size: 0.78rem;
+  color: #fff;
+  font-size: 0.835rem;
   font-weight: 800;
   letter-spacing: 0;
   text-transform: uppercase;
+}
+
+.eyebrow.large {
+  font-size: 1.25rem;
+  margin-bottom: 0;
 }
 
 .topbar-actions,
@@ -56,8 +72,7 @@ body {
 
 .setup-panel,
 .final-panel {
-  background: #fffdf7;
-  border: 1px solid rgba(40, 104, 75, 0.16);
+  background: #007234;
   border-radius: 8px;
   padding: 24px;
 }
@@ -69,7 +84,6 @@ body {
 .setup-copy p,
 .final-panel p {
   margin: 8px 0 0;
-  color: #5e6a62;
 }
 
 .player-list {
@@ -93,8 +107,7 @@ body {
   gap: 12px;
   min-height: 64px;
   padding: 14px 16px;
-  background: #fffdf7;
-  border: 1px solid rgba(36, 55, 47, 0.12);
+  border: 1px solid currentColor;
   border-radius: 8px;
 }
 
@@ -104,14 +117,13 @@ body {
 }
 
 .standing-rank {
-  color: #6b5942;
   font-weight: 800;
+  font-size: 1.2rem;
   margin-right: 8px;
 }
 
 .round-tabs {
   margin-bottom: 18px;
-  background: #fffdf7;
   border: 1px solid rgba(40, 104, 75, 0.14);
   border-radius: 8px;
 }
@@ -135,8 +147,9 @@ body {
 
 .beet-editor {
   padding: 14px;
-  background: #f9f6eb;
-  border: 1px solid rgba(107, 89, 66, 0.16);
+  background: #825a29;
+  border: 4px solid #37180a;
+  box-shadow: inset 0 0 60px #37180acc;
   border-radius: 8px;
 }
 
@@ -151,10 +164,26 @@ body {
 .beet-editor header {
   margin-bottom: 12px;
 }
+.beet-editor .v-btn-toggle .v-btn {
+  border-color: rgba(var(--v-border-color), var(--v-border-opacity))!important;
+}
+
+.beet-editor .v-field__outline {
+  border-color: rgba(var(--v-border-color), var(--v-border-opacity))!important;
+  color: rgba(var(--v-border-color), var(--v-border-opacity))!important;
+  --v-field-border-opacity: 1!important;
+
+  .v-label {
+    color: rgba(var(--v-theme-on-surface), var(--v-high-emphasis-opacity));
+  }
+}
 
 .color-toggle {
   width: 100%;
   margin-bottom: 12px;
+  display: grid!important;
+  grid-template-columns: repeat(3, 1fr);
+  --v-border-color: 255,255,255!important;
 }
 
 .color-toggle .v-btn {
@@ -163,8 +192,13 @@ body {
 
 .number-row {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
+}
+
+.halfsalad {
+  clip-path: inset(0 0 50% 0);
+  margin-bottom: -1rem;
 }
 
 .manual-score {
@@ -175,10 +209,6 @@ body {
   display: grid;
   gap: 8px;
   margin: 0;
-}
-
-.score-breakdown dt {
-  color: #5e6a62;
 }
 
 .score-breakdown dd {
@@ -192,7 +222,7 @@ body {
   font-size: 1.1rem;
 }
 
-.final-panel {
+.final-panel .content {
   display: grid;
   grid-template-columns: minmax(240px, 0.8fr) minmax(320px, 1.2fr);
   gap: 24px;
@@ -205,9 +235,7 @@ body {
   display: grid;
   gap: 24px;
   padding: 28px;
-  background:
-    linear-gradient(135deg, rgba(227, 178, 60, 0.18), rgba(40, 104, 75, 0.08)),
-    #fffdf7;
+  background: #007234;
   border: 1px solid rgba(227, 178, 60, 0.36);
   border-radius: 8px;
 }
@@ -227,17 +255,21 @@ body {
 .podium-hero p {
   margin: 10px auto 0;
   max-width: 680px;
-  color: #5e6a62;
 }
 
 .podium-stage {
   position: relative;
   z-index: 1;
   display: grid;
+  margin-top: 2rem;
   grid-template-columns: repeat(3, minmax(160px, 1fr));
   align-items: end;
-  gap: 14px;
+  gap: 2rem;
   min-height: 300px;
+}
+
+.podium-stage .v-badge__badge {
+  font-size: clamp(2rem, 4vw, 3.8rem)!important;
 }
 
 .podium-place {
@@ -249,10 +281,6 @@ body {
 
 .podium-place strong {
   font-size: 1.25rem;
-}
-
-.podium-place span {
-  color: #5e6a62;
 }
 
 .podium-block {
@@ -323,6 +351,10 @@ body {
   animation: confetti-fall linear infinite;
 }
 
+.v-chip {
+  font-variant-numeric: tabular-nums;
+}
+
 @keyframes confetti-fall {
   0% {
     transform: translate3d(0, -20px, 0) rotate(0deg);
@@ -340,7 +372,7 @@ body {
 
   .topbar,
   .round-summary,
-  .final-panel {
+  .final-panel .content {
     grid-template-columns: 1fr;
     flex-direction: column;
     align-items: stretch;
@@ -371,4 +403,11 @@ body {
   .place-3 .podium-block {
     min-height: 86px;
   }
+}
+
+@font-face {
+  font-family: "Adumu";
+  src: url("./Adumu.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
 }
