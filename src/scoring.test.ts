@@ -13,6 +13,12 @@ describe('scoreBeet', () => {
     expect(scoreBeet({ colors: 3, wholeSalads: 0, hasHalfSalads: true, tomatoes: 0, peppers: 0 })).toBe(0)
   })
 
+  it('scores color points from selected magenta, blue and yellow buttons', () => {
+    expect(scoreBeet({ colorSlots: ['magenta'], wholeSalads: 0, hasHalfSalads: true, tomatoes: 0, peppers: 0 })).toBe(3)
+    expect(scoreBeet({ colorSlots: ['magenta', 'blue'], wholeSalads: 0, hasHalfSalads: true, tomatoes: 0, peppers: 0 })).toBe(1)
+    expect(scoreBeet({ colorSlots: ['magenta', 'blue', 'yellow'], wholeSalads: 0, hasHalfSalads: true, tomatoes: 0, peppers: 0 })).toBe(0)
+  })
+
   it('adds whole salad points', () => {
     expect(scoreBeet({ colors: 3, wholeSalads: 2, hasHalfSalads: true, tomatoes: 0, peppers: 0 })).toBe(2)
   })
@@ -48,10 +54,11 @@ describe('calculateGameTotals', () => {
   it('only includes rounds up to the current round', () => {
     const game = {
       players: [
-        { id: 'p1', name: 'Mina' },
-        { id: 'p2', name: 'Tom' },
+        { id: 'p1', name: 'Mina', color: '#000' },
+        { id: 'p2', name: 'Tom', color: '#000' },
       ],
       currentRound: 1 as const,
+      finished: false,
       rounds: {
         p1: [emptyRoundScore(), emptyRoundScore(), emptyRoundScore()],
         p2: [emptyRoundScore(), emptyRoundScore(), emptyRoundScore()],

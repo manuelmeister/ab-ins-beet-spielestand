@@ -9,9 +9,10 @@
           </div>
 
           <div v-if="game" class="topbar-actions">
-            <v-chip color="primary" variant="flat" prepend-icon="mdi-sprout">
+            <p>
+              <v-icon start icon="mdi-sprout" />
               Runde {{ game.currentRound }} / 3
-            </v-chip>
+            </p>
             <v-btn
               color="win"
               variant="tonal"
@@ -81,7 +82,10 @@
         </section>
 
         <template v-else>
-          <section class="score-strip">
+          <section
+            v-if="game.finished || game.currentRound > 1"
+            class="score-strip"
+          >
             <article
               v-for="standing in standings"
               :key="standing.player.id"
@@ -138,7 +142,7 @@
             <div class="round-actions">
               <v-btn
                 v-if="game.currentRound < 3"
-                color="primary"
+                color="win"
                 variant="flat"
                 append-icon="mdi-arrow-right"
                 @click="advanceRound"
@@ -147,7 +151,7 @@
               </v-btn>
               <v-btn
                 v-else
-                color="primary"
+                color="win"
                 variant="flat"
                 append-icon="mdi-trophy"
                 @click="((selectedTab = podiumTab), (game.finished = true))"
@@ -192,33 +196,30 @@
                     </header>
 
                     <v-btn-toggle
-                      v-model="beet.colors"
+                      v-model="beet.colorSlots"
                       color="surface"
                       density="comfortable"
                       divided
-                      mandatory
+                      multiple
+                      height="auto"
                       class="color-toggle"
                       variant="outlined"
                     >
                       <v-btn
-                        :value="1"
-                        :variant="beet.colors == 1 ? 'flat' : undefined"
-                        active-color="primary"
-                        :base-color="beet.colors == 1 ? 'primary' : undefined"
-                        >1 Farbe</v-btn
+                        v-for="option in beetColorOptions"
+                        :key="option.value"
+                        :value="option.value"
+                        :active-color="option.bg"
+                        :base-color="option.color"
+                        :text="option.label"
+                        class="font-weight-bold"
+                        :variant="
+                          beet.colorSlots?.includes(option.value)
+                            ? 'flat'
+                            : undefined
+                        "
                       >
-                      <v-btn
-                        :value="2"
-                        :variant="beet.colors == 2 ? 'flat' : undefined"
-                        active-color="primary"
-                        >2 Farben</v-btn
-                      >
-                      <v-btn
-                        :value="3"
-                        :variant="beet.colors == 3 ? 'flat' : undefined"
-                        active-color="primary"
-                        >3 Farben</v-btn
-                      >
+                      </v-btn>
                     </v-btn-toggle>
 
                     <div class="number-row">
@@ -246,7 +247,7 @@
                       <div class="d-flex align-center">
                         <v-checkbox
                           v-model="beet.hasHalfSalads"
-                          color="primary"
+                          color="white"
                           density="compact"
                           hide-details
                           label="Halbe Salate?"
@@ -485,6 +486,7 @@
 import { computed, ref, watch } from "vue";
 
 import {
+  BeetColor,
   calculateGameTotals,
   calculateRoundTotals,
   createGame,
@@ -506,6 +508,32 @@ const selectedTab = ref<number>((game.value?.currentRound ?? 1) - 1);
 const finished = ref<boolean>(false);
 const rounds = Array.from({ length: ROUND_COUNT }, (_, index) => index + 1);
 const confettiPieces = Array.from({ length: 34 }, (_, index) => index);
+const allBeetColors: BeetColor[] = ["magenta", "blue", "yellow"];
+const beetColorOptions = [
+  {
+    value: "magenta",
+    label: "Rot",
+    color: "#ff585d",
+    bg: "#d42b37",
+  },
+  {
+    value: "blue",
+    label: "Blau",
+    color: "#629EFF",
+    bg: "#2c64b0",
+  },
+  {
+    value: "yellow",
+    label: "Gelb",
+    color: "#d6c64e",
+    bg: "#cfb439",
+  },
+] satisfies Array<{
+  value: BeetColor;
+  label: string;
+  color: string;
+  bg: string;
+}>;
 
 const canStart = computed(
   () => setupNames.value.filter((name) => name.trim()).length >= 2,
@@ -768,6 +796,22 @@ function initials(name: string): string {
     .join("");
 }
 
+function normalizeBeetColors(beet: {
+  colors?: 1 | 2 | 3;
+  colorSlots?: unknown;
+}) {
+  const selectedColors = Array.isArray(beet.colorSlots)
+    ? beet.colorSlots.filter((color): color is BeetColor =>
+        allBeetColors.includes(color as BeetColor),
+      )
+    : [];
+
+  beet.colorSlots =
+    selectedColors.length > 0
+      ? [...new Set(selectedColors)]
+      : allBeetColors.slice(0, beet.colors ?? 3);
+}
+
 function loadGame(): Game | null {
   const stored = localStorage.getItem(STORAGE_KEY);
 
@@ -790,6 +834,12 @@ function loadGame(): Game | null {
 
     parsed.players.forEach((player) => {
       player.color = playerColor(player.name);
+    });
+
+    Object.values(parsed.rounds).forEach((rounds) => {
+      rounds.forEach((round) => {
+        round.beets?.forEach(normalizeBeetColors);
+      });
     });
 
     return parsed;

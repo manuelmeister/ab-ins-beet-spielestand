@@ -4,8 +4,11 @@ export interface Player {
   color: string;
 }
 
+export type BeetColor = "magenta" | "blue" | "yellow";
+
 export interface BeetScoreInput {
-  colors: 1 | 2 | 3;
+  colors?: 1 | 2 | 3;
+  colorSlots?: BeetColor[];
   wholeSalads: number;
   hasHalfSalads: boolean;
   tomatoes: number;
@@ -37,6 +40,7 @@ export const BEETS_PER_ROUND = 3;
 
 export const emptyBeet = (): BeetScoreInput => ({
   colors: 3,
+  colorSlots: [],
   wholeSalads: 0,
   hasHalfSalads: false,
   tomatoes: 0,
@@ -49,7 +53,8 @@ export const emptyRoundScore = (): RoundScore => ({
 });
 
 export const scoreBeet = (beet: BeetScoreInput): number => {
-  const colorPoints = beet.colors === 1 ? 3 : beet.colors === 2 ? 1 : 0;
+  const colorCount = countBeetColors(beet);
+  const colorPoints = colorCount === 1 ? 3 : colorCount === 2 ? 1 : 0;
   const saladPoints = Math.max(0, beet.wholeSalads);
   const cleanSaladPoint = beet.hasHalfSalads ? 0 : 1;
   const pairPoints = Math.min(
@@ -58,6 +63,23 @@ export const scoreBeet = (beet: BeetScoreInput): number => {
   );
 
   return colorPoints + saladPoints + cleanSaladPoint + pairPoints;
+};
+
+export const countBeetColors = (beet: BeetScoreInput): 1 | 2 | 3 => {
+  const validColors = new Set<BeetColor>(["magenta", "blue", "yellow"]);
+  const count = new Set(
+    (beet.colorSlots ?? []).filter((color): color is BeetColor =>
+      validColors.has(color as BeetColor),
+    ),
+  ).size;
+
+  if (count === 1 || count === 2 || count === 3) {
+    return count;
+  }
+
+  return beet.colors === 1 || beet.colors === 2 || beet.colors === 3
+    ? beet.colors
+    : 3;
 };
 
 export const scoreRoundBeets = (round: RoundScore): number =>
