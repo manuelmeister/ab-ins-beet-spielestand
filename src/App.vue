@@ -6,6 +6,11 @@
           <div>
             <p class="eyebrow large">Spielestand</p>
             <h1>Ab ins Beet</h1>
+            <p class="mt-2">
+              Keine Lust die Punkte von
+              <a class="text-win" href="https://www.gamefactory-games.com/de/spiele/646060">Ab ins Beet</a> der GameFactory
+              selber zusammenzurechnen?
+            </p>
           </div>
 
           <div v-if="game" class="topbar-actions">
